@@ -1,11 +1,11 @@
-from konlpy.tag import Kkma
+from konlpy.tag import Twitter
 from konlpy.utils import pprint
 from bs4 import BeautifulSoup
 import bs4
 import urllib.request
+from textrkr_test import TextRank
 
-from textrankr import TextRank
-kkma = Kkma()
+twt = Twitter()
 
 
 OUTPUT_FILE_NAME = 'output.txt'
@@ -29,7 +29,7 @@ def get_text(url):
                 if (len(a) > 1):
                     text = text + a + '\n\n\n'
                     print(a)
-                    pprint(kkma.pos(a))
+                    pprint(twt.pos(a))
 
     text = text.replace(u'\xa0', u'')
 
@@ -41,7 +41,7 @@ def get_text(url):
                 if (len(a) > 1):
                     text = text + a + '\n'
                     print(a)
-                    pprint(kkma.pos(a))
+                    pprint(twt.pos(a))
         for pic in item.find_all('span', {'class': 'end_photo_org'}):
             print(pic.img)
     text = text.replace(u'\xa0', u'')
@@ -54,6 +54,7 @@ def main():
     tes = TextRank(result_text)
     print('\n---------요약결과----------\n')
     print(tes.summarize())
+    print(tes.bow)
     open_output_file.write(result_text)
     open_output_file.close()
 

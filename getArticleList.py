@@ -141,7 +141,7 @@ def get_art_list(sid, date=datetime.date.today()):
 
     print("\n\n --------------일반 기사(페이징 처리된 '더 보기' 기사들)-------------- \n\n")
     page = 1  # 일단 1page부터 시작임. 암튼 그럼.
-    not_end = True # while 루프의 해제
+    not_end = True  # while 루프의 해제
     # !!특정 페이지 안에도 해당 페이지 내에서 많이 본 기사인'헤드라인'으로 구성된 주요 뉴스가 따로 있긴 하다. 관련없이 그냥 모으기로 함.
 
     while not_end:
@@ -156,7 +156,7 @@ def get_art_list(sid, date=datetime.date.today()):
             print('\n\n---------------STOP!!!!-------------\n\n')
             break
 
-        if((page -1)%10 == 0) and _nbtn is None:
+        if page != 1 and ((page -1) % 10 == 0) and _nbtn is None:
             print('\n\n---------------STOP!!!!-------------\n\n')
             break
 
@@ -178,18 +178,18 @@ def get_art_list(sid, date=datetime.date.today()):
             print(_sub.text + ' : ' + _link)
             res.update({_link: _sub.text})
 
-        page += 1
+        page = page + 1
 
-        driver.implicitly_wait(3)
+    driver.implicitly_wait(3)
 
-        open_output_file = open(OUTPUT_FILE_NAME, 'w', encoding='utf-8')
-        open_output_file.write(to_json.artdic_to_json(res))
-        open_output_file.close()
+    open_output_file = open(OUTPUT_FILE_NAME, 'w', encoding='utf-8')
+    open_output_file.write(to_json.artdic_to_json(res))
+    open_output_file.close()
 
 
 # 테스트 : sid=100 은 정치
 # 왠만해선 네이버에서 제공하는 뉴스 카테고리를 십분 활용해보고자, html소스코드를 좀 더 파보고 있다.
-get_art_list(100)
+get_art_list(105)
 
 
 
