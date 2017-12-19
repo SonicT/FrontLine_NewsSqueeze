@@ -156,7 +156,7 @@ def get_art_list(sid, date=datetime.date.today()):
             print('\n\n---------------STOP!!!!-------------\n\n')
             break
 
-        if((page -1)%10 == 0) and _nbtn is None:
+        if page != 1 and ((page -1) % 10 == 0) and _nbtn is None:
             print('\n\n---------------STOP!!!!-------------\n\n')
             break
 
