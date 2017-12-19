@@ -35,7 +35,7 @@ def get_art_list(sid, date=datetime.date.today()):
 
     soup = sp.find('div', {'id': 'main_content'})
 
-    # 카테고리가 정해진 메인 기사들- 정게댓글할배들을 겨냥해선지 웬만해선 정치면에서만 존재한다. 없으면 None이 됨.
+    # 카테고리가 정해진 메인 기사들- 웬만해선 정치면에서만 존재한다. 없으면 None이 됨.
     print("\n\n -------------기사 최고 메인 -------------- \n\n")
     for item in soup.find_all('div', {'class': "section_headline headline_subordi"}):
         keyword = item.find('h5', {'class' : 'compo_headtxt'})
