@@ -62,6 +62,7 @@ pprint(kes)
 1. getArticleList.py
 2. getArticle.py
 3. 요약 및 데이터 처리(summ.py)
-4. '의심 명사' 유효성 검토, 새 단어 저장(newword.py)
-5. 키워드 관리 및 저장(w2v.py)
+4. '의심 명사' 유효성 검토, 새 단어 저장(newword.py) >> import re, tensorflow as tf
+5. 키워드 관리 및 저장(w2v.py) >> import customword2vec
+      해당 카테고리 혹은 
 """
