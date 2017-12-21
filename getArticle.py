@@ -4,14 +4,15 @@ from bs4 import BeautifulSoup
 import bs4
 import urllib.request
 from textrkr_test import TextRank
+import math
+import numpy
+import operator
 
 twt = Twitter()
 
-
 OUTPUT_FILE_NAME = 'output.txt'
 
-URL = 'http://news.naver.com/main/ranking/read.nhn?mid=etc&sid1=111&rankingType=popular_day' \
-      '&oid=001&aid=0009756551&date=20171218&type=1&rankingSeq=6&rankingSectionId=100'
+URL = 'http://news.naver.com/main/read.nhn?mode=LSD&mid=sec&sid1=100&oid=001&aid=0009764552'
 
 
 # 크롤링 +분석 함수 --> 파이썬 함수는 def 함수명 (매개변수) : 엔터 치고 탭임
@@ -54,7 +55,29 @@ def main():
     tes = TextRank(result_text)
     print('\n---------요약결과----------\n')
     print(tes.summarize())
-    print(tes.bow)
+
+    _res={}
+    _tots = len(tes.sentences)
+    for key, count in tes.bow.items():
+        _bigD = 0
+        _data = []
+        for stb in tes.sentences:
+            if stb.bow[key] >0:
+                _bigD += 1
+        for stc in tes.sentences:
+            if stc.bow[key] > 0:
+                _idf = math.log(_tots/_bigD, 2)
+                _tf = math.log(stc.bow[key] + 1, 2)
+                _data.append(_tf * _idf)
+
+        _avg = numpy.average(_data)
+        _var = numpy.var(_data)
+        listk = key + '- number : ' + str(_bigD) + ', avg : ' + str(_avg) + ', variance : ' + str(_var)
+        _res.update({listk: _avg})
+    _res = sorted(_res.items(), key=operator.itemgetter(1))
+    for a in _res:
+        print(a[0])
+
     open_output_file.write(result_text)
     open_output_file.close()
 
