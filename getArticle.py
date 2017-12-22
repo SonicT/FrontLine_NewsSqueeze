@@ -12,7 +12,7 @@ twt = Twitter()
 
 OUTPUT_FILE_NAME = 'output.txt'
 
-URL = 'http://news.naver.com/main/read.nhn?mode=LSD&mid=sec&sid1=100&oid=001&aid=0009764552'
+URL = 'http://news.naver.com/main/read.nhn?oid=001&aid=0009767851'
 
 
 # 크롤링 +분석 함수 --> 파이썬 함수는 def 함수명 (매개변수) : 엔터 치고 탭임
@@ -54,9 +54,9 @@ def main():
     result_text = get_text(URL)
     tes = TextRank(result_text)
     print('\n---------요약결과----------\n')
-    print(tes.summarize())
-
-    _res={}
+    print(tes.summarize(4))
+    print('\n\n----------nouns----------\n' + str(tes.nouns) + '\n')
+    _res = {}
     _tots = len(tes.sentences)
     for key, count in tes.bow.items():
         _bigD = 0
