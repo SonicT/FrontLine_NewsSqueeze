@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from konlpy.tag import Twitter
 from konlpy.utils import pprint
 from bs4 import BeautifulSoup
@@ -38,8 +39,8 @@ def get_text(url):
         # print(item) #이 선택자의 html 나옴
         children = item.children
         for a in children:
-            if (type(a) == bs4.element.NavigableString):
-                if (len(a) > 1):
+            if type(a) == bs4.element.NavigableString:
+                if len(a) > 1:
                     text = text + a + '\n'
                     print(a)
                     pprint(twt.pos(a))
