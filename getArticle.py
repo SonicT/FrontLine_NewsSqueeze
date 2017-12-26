@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from konlpy.tag import Twitter
 from konlpy.utils import pprint
 from bs4 import BeautifulSoup
@@ -12,7 +13,7 @@ twt = Twitter()
 
 OUTPUT_FILE_NAME = 'output.txt'
 
-URL = 'http://news.naver.com/main/read.nhn?oid=001&aid=0009767851'
+URL = 'http://news.naver.com/main/ranking/read.nhn?oid=003&aid=0008360670'
 
 
 # 크롤링 +분석 함수 --> 파이썬 함수는 def 함수명 (매개변수) : 엔터 치고 탭임
@@ -26,8 +27,8 @@ def get_text(url):
     for title in soup.find_all('h3',{'id':'articleTitle'}):
         children = title.children
         for a in children:
-            if (type(a) == bs4.element.NavigableString):
-                if (len(a) > 1):
+            if type(a) == bs4.element.NavigableString:
+                if len(a) > 1:
                     text = text + a + '\n\n\n'
                     print(a)
                     pprint(twt.pos(a))
@@ -38,8 +39,8 @@ def get_text(url):
         # print(item) #이 선택자의 html 나옴
         children = item.children
         for a in children:
-            if (type(a) == bs4.element.NavigableString):
-                if (len(a) > 1):
+            if type(a) == bs4.element.NavigableString:
+                if len(a) > 1:
                     text = text + a + '\n'
                     print(a)
                     pprint(twt.pos(a))
@@ -62,7 +63,7 @@ def main():
         _bigD = 0
         _data = []
         for stb in tes.sentences:
-            if stb.bow[key] >0:
+            if stb.bow[key] > 0:
                 _bigD += 1
         for stc in tes.sentences:
             if stc.bow[key] > 0:
