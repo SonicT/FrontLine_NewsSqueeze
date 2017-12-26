@@ -11,15 +11,12 @@ import to_json
 path = os.path.abspath(__file__)
 dir_path = os.path.dirname(path)
 
-res={}
+res = {}
+
+
 def get_art_list(sid, date=datetime.date.today()):
     OUTPUT_FILE_NAME = '../news/links/' + str(sid) + '/' + str(date) + '.json'
     url = 'http://news.naver.com/main/main.nhn?sid1=' + str(sid)
-    today = datetime.date.today()
-
-    # 추가 파라미터로서 지난 뉴스 검색 : datetime의 date 객체가 주어지면, 그 날의 뉴스 리스트를 가져올 것이다. 없으면 오늘자로.
-    if(date is not None):
-        today = date
 
     # 프로젝트 경로에서 크롬 드라이버 찾기
     driver = webdriver.Chrome(dir_path  + '/chromedriver/chromedriver.exe')
@@ -40,7 +37,7 @@ def get_art_list(sid, date=datetime.date.today()):
     for item in soup.find_all('div', {'class': "section_headline headline_subordi"}):
         keyword = item.find('h5', {'class' : 'compo_headtxt'})
 
-        #참고 : 키워드가 구성되지 않은 섹션도 있다. 이럴 경우 예외처리를 통해 '키워드 없음'으로 저장해야겠음.
+        # 참고 : 키워드가 구성되지 않은 섹션도 있다. 이럴 경우 예외처리를 통해 '키워드 없음'으로 저장해야겠음.
         if(keyword is not None):
             subjtitle = keyword.find('a', {'class' : 'compo_linkhead'})
             if(subjtitle is not None):
@@ -53,7 +50,7 @@ def get_art_list(sid, date=datetime.date.today()):
         print('\n[')
         for list in item.find_all('li'):
             link = list.find('a', href=True)
-            if(link is not None):
+            if link is not None:
                 title = link.text.replace('\n', '')
                 print(title + ' : ' + link['href'])
                 res.update({str(link['href']) : title})
@@ -64,16 +61,16 @@ def get_art_list(sid, date=datetime.date.today()):
     for item_indepTitle in soup.find_all('div', {'class': 'section_headline headline_pht_small'}):
         for component in item_indepTitle.find_all('dl'):
             keyword = component.find_all('dt')
-            if ((len(keyword) > 1) and keyword is not None):
+            if (len(keyword) > 1) and keyword is not None:
                 art_title = keyword[1].text.replace('\n','')
                 art_link = keyword[1].find('a', href=True)
-                if (art_link is not None):
+                if art_link is not None:
                     print(art_title + ' : ' + art_link['href'])
                     res.update({str(art_link['href']): art_title})
-            elif (keyword is not None):
+            elif keyword is not None:
                 art_title = keyword[0].text
                 art_link = keyword[0].find('a', href=True)
-                if (art_link is not None):
+                if art_link is not None:
                     print(art_title + ' : ' + art_link['href'])
                     res.update({str(art_link['href']): art_title})
 
@@ -82,17 +79,17 @@ def get_art_list(sid, date=datetime.date.today()):
     for item_indepTitle2 in soup.find_all('div', {'class': 'section_headline headline_pht_small2'}):
         for component in item_indepTitle2.find_all('dl'):
             keyword = component.find_all('dt')
-            if ((len(keyword) > 1) and keyword is not None):
+            if (len(keyword) > 1) and keyword is not None:
                 art_title = keyword[1].text.replace('\n','')
                 art_link = keyword[1].find('a', href=True)
-                if (art_link is not None):
+                if art_link is not None:
                     print(art_title + ' : ' + art_link['href'])
                     res.update({str(art_link['href']): art_title})
 
-            elif (keyword is not None):
+            elif keyword is not None:
                 art_title = keyword[0].text.replace('\n','')
                 art_link = keyword[0].find('a', href=True)
-                if (art_link is not None):
+                if art_link is not None:
                     print(art_title + ' : ' + art_link['href'])
                     res.update({str(art_link['href']): art_title})
 
@@ -101,17 +98,17 @@ def get_art_list(sid, date=datetime.date.today()):
     for item_indepTitle3 in soup.find_all('div', {'class': 'section_headline headline_pht_small3'}):
         for component in item_indepTitle3.find_all('dl'):
             keyword = component.find_all('dt')
-            if ((len(keyword) > 1) and keyword is not None):
+            if (len(keyword) > 1) and keyword is not None:
                 art_title = keyword[1].text.replace('\n','')
                 art_link = keyword[1].find('a', href=True)
-                if (art_link is not None):
+                if art_link is not None:
                     print(art_title + ' : ' + art_link['href'])
                     res.update({str(art_link['href']): art_title})
 
-            elif (keyword is not None):
+            elif keyword is not None:
                 art_title = keyword[0].text.replace('\n','')
                 art_link = keyword[0].find('a', href=True)
-                if (art_link is not None):
+                if art_link is not None:
                     print(art_title + ' : ' + art_link['href'])
                     res.update({str(art_link['href']): art_title})
 
@@ -120,14 +117,14 @@ def get_art_list(sid, date=datetime.date.today()):
     for item_small in soup.find_all('div', {'class': 'section_headline headline_pht_small2_1'}):
         for component in item_small.find_all('dl'):
             keyword = component.find_all('dt')
-            if((len(keyword) > 1) and keyword is not None):
-                art_title = keyword[1].text.replace('\n','')
+            if (len(keyword) > 1) and keyword is not None:
+                art_title = keyword[1].text.replace('\n', '')
                 art_link = keyword[1].find('a', href=True)
-                if(art_link is not None):
+                if art_link is not None:
                     print(str(art_title) + ' : ' + art_link['href'])
                     res.update({str(art_link['href']): str(art_title)})
 
-            elif(keyword is not None):
+            elif keyword is not None:
                 art_title = keyword[0].text.replace('\n','')
                 art_link = keyword[0].find('a', href=True)
                 if (art_link is not None):
@@ -152,7 +149,7 @@ def get_art_list(sid, date=datetime.date.today()):
         # 1-10까지 있을 경우, 해당 페이지 숫자 1개를 제외하고 있어야 하는 _paging 클래스 버튼 수는 9개!
         _pages = soup.find('div', {'id': 'paging'}).find_all('a', {'class': '_paging'})
 
-        if (((page - 1) % 10 != 0) and (len(_pages) < (page% 10))):
+        if ((page - 1) % 10 != 0) and (len(_pages) < (page% 10)):
             print('\n\n---------------STOP!!!!-------------\n\n')
             break
 
@@ -160,7 +157,7 @@ def get_art_list(sid, date=datetime.date.today()):
             print('\n\n---------------STOP!!!!-------------\n\n')
             break
 
-        nurl= url + '#&date=' + str(today) + ' 00:00:00&page=' + str(page)
+        nurl= url + '#&date=' + str(date) + ' 00:00:00&page=' + str(page)
         print('\n\n---------------page' + str(page)+'------------\n\n')
         driver.get(nurl)
         WebDriverWait(driver, 2)
@@ -173,7 +170,7 @@ def get_art_list(sid, date=datetime.date.today()):
         for _articles in _ul.find_all('li'):
             _sub = _articles.find('a', href=True)
             _link = _sub['href']
-            if(_link.startswith('/')):
+            if _link.startswith('/'):
                 _link = 'http://news.naver.com' + _link
             print(_sub.text + ' : ' + _link)
             res.update({_link: _sub.text})
@@ -190,8 +187,3 @@ def get_art_list(sid, date=datetime.date.today()):
 # 테스트 : sid=100 은 정치
 # 왠만해선 네이버에서 제공하는 뉴스 카테고리를 십분 활용해보고자, html소스코드를 좀 더 파보고 있다.
 get_art_list(100)
-
-
-
-
-
