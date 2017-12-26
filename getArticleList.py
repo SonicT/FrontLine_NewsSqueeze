@@ -38,7 +38,7 @@ def get_art_list(sid, date=datetime.date.today()):
         keyword = item.find('h5', {'class' : 'compo_headtxt'})
 
         # 참고 : 키워드가 구성되지 않은 섹션도 있다. 이럴 경우 예외처리를 통해 '키워드 없음'으로 저장해야겠음.
-        if(keyword is not None):
+        if keyword is not None:
             subjtitle = keyword.find('a', {'class' : 'compo_linkhead'})
             if(subjtitle is not None):
                 print(subjtitle.text)
