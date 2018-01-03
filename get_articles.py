@@ -6,7 +6,9 @@ import pymysql.cursors
 import datetime
 import time
 from urllib.parse import urlparse, parse_qs
+import urllib.request
 from pymysql.err import MySQLError
+from urllib import error as urlerror
 
 # os : 시스템이 돌아가는 절대경로를 얻기 위한 과정. 크롬 드라이버가 탑재되어 있으므로 이를 통해 경로를 얻었다.
 path = os.path.abspath(__file__)
@@ -15,11 +17,31 @@ dir_path = os.path.dirname(path)
 res = {}
 
 
+def get_article(url):
+    soupurl = urllib.request.urlopen(url)
+    soup = bs4.BeautifulSoup(soupurl, 'lxml', from_encoding='utf-8')
+    text = ''
+    img_src = ''
+    for item in soup.find_all('div', {'id': 'articleBodyContents'}):
+        # print(item) #이 선택자의 html 나옴
+        children = item.children
+        for a in children:
+            if type(a) == bs4.element.NavigableString:
+                if len(a) > 1:
+                    text = text + a + '\n'
+                    print(a)
+        _imgbuf = item.find('span', {'class': 'end_photo_org'})
+        if _imgbuf is not None:
+            img_src = str(_imgbuf.img)
+
+    return [text, img_src]
+
+
 def get_art_list(sid, date=datetime.date.today()):
     url = 'http://news.naver.com/main/main.nhn?sid1=' + str(sid)
 
     # 프로젝트 경로에서 크롬 드라이버 찾기
-    driver = webdriver.Chrome(dir_path  + '/chromedriver/chromedriver.exe')
+    driver = webdriver.Chrome(dir_path + '/chromedriver/chromedriver.exe')
 
     # 시동을 위해 기다려줘야 한다는 설명이 있다.... 근데 이만큼 기다리는거 맞아?
     driver.implicitly_wait(3)
@@ -32,7 +54,6 @@ def get_art_list(sid, date=datetime.date.today()):
 
     soup = sp.find('div', {'id': 'main_content'})
 
-<<<<<<< HEAD
     # 카테고리가 정해진 메인 기사들 None이 됨. 날짜가 당일일 경우에만 유효하다.
     if date == datetime.date.today():
         print("\n\n -------------기사 최고 메인 -------------- \n\n")
@@ -41,7 +62,7 @@ def get_art_list(sid, date=datetime.date.today()):
 
             # 참고 : 키워드가 구성되지 않은 섹션도 있다. 이럴 경우 예외처리를 통해 '키워드 없음'으로 저장해야겠음.
             if keyword is not None:
-                subjtitle = keyword.find('a', {'class' : 'compo_linkhead'})
+                subjtitle = keyword.find('a', {'class': 'compo_linkhead'})
                 if subjtitle is not None:
                     print(subjtitle.text)
                 else:
@@ -134,108 +155,6 @@ def get_art_list(sid, date=datetime.date.today()):
                         res.update({art_link['href']: str(art_title)})
 
     # '페이징 처리'로 볼 수 있는 기사들. 여기서부턴 이전 날짜의 링크들도 저장된다.
-=======
-    # 카테고리가 정해진 메인 기사들- 정게댓글할배들을 겨냥해선지 웬만해선 정치면에서만 존재한다. 없으면 None이 됨.
-    print("\n\n -------------기사 최고 메인 -------------- \n\n")
-    for item in soup.find_all('div', {'class': "section_headline headline_subordi"}):
-        keyword = item.find('h5', {'class' : 'compo_headtxt'})
-
-        # 참고 : 키워드가 구성되지 않은 섹션도 있다. 이럴 경우 예외처리를 통해 '키워드 없음'으로 저장해야겠음.
-        if keyword is not None:
-            subjtitle = keyword.find('a', {'class' : 'compo_linkhead'})
-            if(subjtitle is not None):
-                print(subjtitle.text)
-            else:
-                subjtitle = keyword.text
-                print(subjtitle)
-        else:
-            print('No Subject')
-        print('\n[')
-        for list in item.find_all('li'):
-            link = list.find('a', href=True)
-            if link is not None:
-                title = link.text.replace('\n', '')
-                print(title + ' : ' + link['href'])
-                res.update({str(link['href']) : title})
-        print(']\n')
-
-    # 일반 메인 기사들
-    print("\n\n -------------주요기사 일반 -------------- \n\n")
-    for item_indepTitle in soup.find_all('div', {'class': 'section_headline headline_pht_small'}):
-        for component in item_indepTitle.find_all('dl'):
-            keyword = component.find_all('dt')
-            if (len(keyword) > 1) and keyword is not None:
-                art_title = keyword[1].text.replace('\n','')
-                art_link = keyword[1].find('a', href=True)
-                if art_link is not None:
-                    print(art_title + ' : ' + art_link['href'])
-                    res.update({str(art_link['href']): art_title})
-            elif keyword is not None:
-                art_title = keyword[0].text
-                art_link = keyword[0].find('a', href=True)
-                if art_link is not None:
-                    print(art_title + ' : ' + art_link['href'])
-                    res.update({str(art_link['href']): art_title})
-
-    # 왜 따로 분류되었는지 모른 2의 일족
-    print("\n\n -------------주요기사 일반 2-------------- \n\n")
-    for item_indepTitle2 in soup.find_all('div', {'class': 'section_headline headline_pht_small2'}):
-        for component in item_indepTitle2.find_all('dl'):
-            keyword = component.find_all('dt')
-            if (len(keyword) > 1) and keyword is not None:
-                art_title = keyword[1].text.replace('\n','')
-                art_link = keyword[1].find('a', href=True)
-                if art_link is not None:
-                    print(art_title + ' : ' + art_link['href'])
-                    res.update({str(art_link['href']): art_title})
-
-            elif keyword is not None:
-                art_title = keyword[0].text.replace('\n','')
-                art_link = keyword[0].find('a', href=True)
-                if art_link is not None:
-                    print(art_title + ' : ' + art_link['href'])
-                    res.update({str(art_link['href']): art_title})
-
-    # 왜 따로 분류되었는지 모른 3의 일족
-    print("\n\n -------------주요기사 일반 3-------------- \n\n")
-    for item_indepTitle3 in soup.find_all('div', {'class': 'section_headline headline_pht_small3'}):
-        for component in item_indepTitle3.find_all('dl'):
-            keyword = component.find_all('dt')
-            if (len(keyword) > 1) and keyword is not None:
-                art_title = keyword[1].text.replace('\n','')
-                art_link = keyword[1].find('a', href=True)
-                if art_link is not None:
-                    print(art_title + ' : ' + art_link['href'])
-                    res.update({str(art_link['href']): art_title})
-
-            elif keyword is not None:
-                art_title = keyword[0].text.replace('\n','')
-                art_link = keyword[0].find('a', href=True)
-                if art_link is not None:
-                    print(art_title + ' : ' + art_link['href'])
-                    res.update({str(art_link['href']): art_title})
-
-    # 굳이 왜 분류했는지 모르는 small 컨텐트
-    print("\n\n -------------주요기사 작음 2_1-------------- \n\n")
-    for item_small in soup.find_all('div', {'class': 'section_headline headline_pht_small2_1'}):
-        for component in item_small.find_all('dl'):
-            keyword = component.find_all('dt')
-            if (len(keyword) > 1) and keyword is not None:
-                art_title = keyword[1].text.replace('\n', '')
-                art_link = keyword[1].find('a', href=True)
-                if art_link is not None:
-                    print(str(art_title) + ' : ' + art_link['href'])
-                    res.update({str(art_link['href']): str(art_title)})
-
-            elif keyword is not None:
-                art_title = keyword[0].text.replace('\n','')
-                art_link = keyword[0].find('a', href=True)
-                if (art_link is not None):
-                    print(str(art_title) + ' : ' + art_link['href'])
-                    res.update({art_link['href']: str(art_title)})
-
-    # '페이징 처리'로 볼 수 있는 기사들
->>>>>>> 060eb330900d393b260aa4578656e2b09561c68b
     # 자바스크립트로 생성하는 것인지, jsp에서 서버응답을 기다리는 것인지 여튼 여기는 그냥 긁어오는 html태그로는 보이지 않는다.
     # 처음에는 많이들 사용하는 phantomJS headless client를 사용하려 했으나, 루비랑 사파이어? 등등 다 설치해야 한다고 그래서 그냥 버렸다(윈도만 싫어하는 거지같은 세상)
     # 대안으로 크롬의 크롬드라이버를 사용하여 실제로는 사용자를 위해 실행되지 않는 프로그램(headless client)을 대체.
@@ -265,7 +184,7 @@ def get_art_list(sid, date=datetime.date.today()):
         print('\n\n---------------page' + str(page)+'------------\n\n')
         driver.get(nurl)
         WebDriverWait(driver, 2)
-        time.sleep(1)
+        time.sleep(0.7)
 
         soup = bs4.BeautifulSoup(driver.page_source, 'lxml')
 
@@ -288,30 +207,47 @@ def get_art_list(sid, date=datetime.date.today()):
                            password='TIGER',
                            db='NewsSummary',
                            charset='utf8mb4')
+    count = 0
+    _1062count = 0
     for url, title in res.items():
-        cursor = conn.cursor()
         query = parse_qs(urlparse(url).query)
         try:
             oid = query['oid']
             aid = query['aid']
-        except:
+            # 방송 컨텐츠가 주를 이루는 멀티미디어 언론사들은 커트하기로 한다.
+            if oid in ['449', '422', '215', '437', '056', '214', '374', '055', '052', '448']:
+                continue
+        except urlerror.URLError:
             print(url)
-        sql = 'INSERT INTO Link (sid, oid, aid, url, title, date) VALUES (%s,%s,%s,%s,%s,%s)'
+        time.sleep(0.5)
+        # 이제 기사도 읽어오자!!
+        urlget = get_article(url)
+        article_text = urlget[0]
+        article_img = urlget[1]
+        cursor = conn.cursor()
+        sql = 'INSERT INTO article (oid, aid, sid, date, url, title, content, img, cnt)' \
+              ' values (%s,%s,%s,%s,%s,%s,%s,%s,%s)'
 
         try:
-            cursor.execute(sql, (sid, oid, aid, url, title, str(date)))
+            cursor.execute(sql, (oid, aid, sid, str(date), url, title, article_text, article_img, str(0)))
             conn.commit()
-        except MySQLError:
-            print('중복있나봄 넘어갈게여')
+            count += 1
+        except MySQLError as e:
+            print('중복이 있거나 형식에 에러가 있나봄 넘어갈게여')
+            print('Got error {!r}, errno is {}'.format(e, e.args[0]))
+            if e.args[0] == 1062:
+                _1062count += 1
+                print('1062 중복 에러 {}회'.format(_1062count))
+                if _1062count > 19:
+                    conn.rollback()
+                    print('중복 20회 이상으로 종료합니다 : 더 이상 할 필요 없을거 같아요.')
+                    break
+            conn.rollback()
             continue
-    print(cursor.lastrowid)
     conn.close()
+    print('{}개 업데이트 완료.'.format(count))
 
 
 # 테스트 : sid=100 은 정치
 # 왠만해선 네이버에서 제공하는 뉴스 카테고리를 십분 활용해보고자, html소스코드를 좀 더 파보고 있다.
-<<<<<<< HEAD
-get_art_list(101)
-=======
-get_art_list(100)
->>>>>>> 060eb330900d393b260aa4578656e2b09561c68b
+get_art_list(100, datetime.date.today() - datetime.timedelta(1))
